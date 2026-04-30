@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비엔 운영팀 AI 도구 가이드</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #f7f7f5; color: #1a1a1a; min-height: 100vh; }
+  .page { max-width: 820px; margin: 0 auto; padding: 52px 24px 100px; }
+  .org-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: 24px; font-weight: 700; color: #111; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #999; margin-bottom: 36px; line-height: 1.6; }
+  .tab-bar { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+  .tab { padding: 7px 18px; border-radius: 999px; border: 1px solid #ddd; font-size: 13px; font-weight: 500; cursor: pointer; background: #fff; color: #666; font-family: inherit; transition: all 0.15s; }
+  .tab:hover { border-color: #999; color: #111; }
+  .tab.on { background: #111; color: #fff; border-color: #111; }
+  .section { display: none; }
+  .section.on { display: block; }
+  .tool-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pill { padding: 5px 14px; border-radius: 999px; border: 1px solid #ddd; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; color: #666; font-family: inherit; transition: all 0.15s; }
+  .pill:hover { border-color: #999; color: #111; }
+  .pill.on { background: #111; color: #fff; border-color: #111; }
+  .tool-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 24px 28px; display: none; }
+  .tool-card.on { display: block; }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .tool-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+  .tool-name { font-size: 17px; font-weight: 700; color: #111; }
+  .tool-price { margin-left: auto; font-size: 12px; color: #999; border: 1px solid #eee; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .tool-position { font-size: 13px; color: #777; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #f0f0f0; line-height: 1.5; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 540px) { .detail-grid { grid-template-columns: 1fr; } }
+  .detail-box { padding: 14px 16px; border-radius: 12px; }
+  .box-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 9px; }
+  .detail-box ul { padding-left: 16px; }
+  .detail-box li { font-size: 13px; line-height: 1.8; }
+  .box-green { background: #f0fdf4; }
+  .box-green .box-label { color: #16a34a; }
+  .box-green li { color: #166534; }
+  .box-warn { background: #fffbeb; }
+  .box-warn .box-label { color: #ca8a04; }
+  .box-warn li { color: #92400e; }
+  .use-box { background: #eff6ff; padding: 14px 16px; border-radius: 12px; margin-bottom: 16px; }
+  .use-box .box-label { color: #1d4ed8; }
+  .use-box li { font-size: 13px; color: #1e3a8a; line-height: 1.8; padding-left: 16px; }
+  .use-box ul { padding-left: 16px; }
+  .divider { border: none; border-top: 1px solid #f0f0f0; margin: 16px 0; }
+  .match-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 10px; }
+  .job-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .job-badge { font-size: 12px; padding: 4px 11px; border-radius: 999px; background: #f5f5f5; color: #bbb; }
+  .job-badge.match { background: #eff6ff; color: #2563eb; font-weight: 600; }
+  .scenario-group { margin-bottom: 28px; }
+  .scenario-job-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: #2563eb; text-transform: uppercase; margin-bottom: 12px; background: #eff6ff; display: inline-block; padding: 4px 12px; border-radius: 999px; }
+  .scenario-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px 20px; margin-bottom: 8px; }
+  .scenario-tag { font-size: 11px; font-weight: 600; color: #aaa; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .scenario-step { font-size: 13px; color: #444; line-height: 1.6; padding: 3px 0; }
+  .scenario-arrow { font-size: 12px; color: #ccc; padding: 2px 0; }
+  .scenario-result { font-size: 13px; color: #16a34a; font-weight: 600; padding: 3px 0; line-height: 1.6; }
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 540px) { .rec-grid { grid-template-columns: 1fr; } }
+  .rec-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px 22px; }
+  .rec-job-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #aaa; text-transform: uppercase; margin-bottom: 10px; }
+  .rec-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge-1 { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
+  .badge-2 { font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: #f5f5f5; color: #666; }
+  .rec-why { font-size: 13px; color: #777; line-height: 1.7; }
+  .footer { margin-top: 64px; text-align: center; font-size: 12px; color: #ccc; line-height: 2; }
+  .footer strong { color: #aaa; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <p class="org-label">Bien Animal Specialized Medical Center</p>
+  <h1>운영팀 AI 도구 가이드</h1>
+  <p class="subtitle">직무에 맞는 AI 도구를 골라보세요.<br>탭을 클릭하면 장단점·활용 시나리오·추천 조합을 확인할 수 있어요.</p>
+
+  <div class="tab-bar">
+    <button class="tab on" onclick="switchTab('tools',this)">용도별 툴 특징</button>
+    <button class="tab" onclick="switchTab('scenario',this)">직무별 활용 시나리오</button>
+    <button class="tab" onclick="switchTab('rec',this)">직무별 추천 조합</button>
+  </div>
+
+  <!-- 섹션 1 -->
+  <div id="sec-tools" class="section on">
+    <div class="tool-pills">
+      <button class="pill on" onclick="switchTool('claude',this)">Claude</button>
+      <button class="pill" onclick="switchTool('chatgpt',this)">ChatGPT</button>
+      <button class="pill" onclick="switchTool('gemini',this)">Gemini</button>
+      <button class="pill" onclick="switchTool('notebook',this)">NotebookLM</button>
+      <button class="pill" onclick="switchTool('perplexity',this)">Perplexity</button>
+      <button class="pill" onclick="switchTool('midjourney',this)">Midjourney</button>
+    </div>
+
+    <div id="tool-claude" class="tool-card on">
+      <div class="card-head"><div class="tool-dot" style="background:#5B8DEF"></div><span class="tool-name">Claude Pro</span><span class="tool-price">$20/월 (약 28,000원)</span></div>
+      <p class="tool-position">사람이 쓴 것처럼 자연스러운 글을 뽑아내는 AI</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>한국어 뉘앙스·어조를 가장 잘 살림 — "기계가 쓴 것 같다"는 소리 안 나옴</li><li>긴 자료 여러 개를 한 번에 올려도 전체 맥락을 놓치지 않음</li><li>분석 결과를 구조화해서 정리하는 능력이 탁월</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>유료여도 하루 사용량 한도 있음 — 작업 많은 날 중간에 멈춤</li><li>대화가 길어지면 새 창을 열어야 해서 맥락이 끊기는 경우 있음</li><li>실시간 검색이 기본으로 꺼져 있어 최신 정보는 직접 켜야 함</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>보고서·공지·기획서 초안 작성 후 다듬기</li><li>면담·인터뷰 녹취록 → 패턴 도출 및 구조화</li><li>설문 응답 → 인사이트 요약</li><li>발표 자료 스크립트 작성</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge match">HR</span><span class="job-badge match">마케팅 기획</span><span class="job-badge">디자인</span><span class="job-badge match">영상 기획</span><span class="job-badge">운영 인프라</span><span class="job-badge">구매·회계</span></div>
+    </div>
+
+    <div id="tool-chatgpt" class="tool-card">
+      <div class="card-head"><div class="tool-dot" style="background:#19C37D"></div><span class="tool-name">ChatGPT Plus</span><span class="tool-price">$20/월 (약 28,000원)</span></div>
+      <p class="tool-position">뭐든 일단 시켜볼 수 있는 가장 범용적인 AI</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>엑셀 파일 올리면 통계·그래프 자동 생성</li><li>일러스트·캐릭터 스타일 이미지 생성 내장 (DALL-E)</li><li>다양한 스타일 글쓰기·번역·요약 무난하게 처리</li><li>사용법이 직관적이고 대화하며 수정하기 쉬움</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>개인 계정은 대화 내용이 AI 학습에 활용될 수 있음 — 민감 자료 입력 주의</li><li>피크 시간대(낮 12~2시) 서버 느려지는 경우 있음</li><li>자연스러운 한국어 문장 감성은 Claude 대비 약간 기계적</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>엑셀·데이터 파일 분석 및 시각화</li><li>블로그·SNS 카피 초안 작성</li><li>행사 기획안·제안서 초안</li><li>이미지 시안(일러스트 계열) 빠르게 생성</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge">HR</span><span class="job-badge match">마케팅 기획</span><span class="job-badge match">디자인</span><span class="job-badge match">영상 기획</span><span class="job-badge match">운영 인프라</span><span class="job-badge match">구매·회계</span></div>
+    </div>
+
+    <div id="tool-gemini" class="tool-card">
+      <div class="card-head"><div class="tool-dot" style="background:#EA4335"></div><span class="tool-name">Gemini Pro</span><span class="tool-price">$19.99/월 (약 28,000원)</span></div>
+      <p class="tool-position">Google 도구와 연결되고, 실사 이미지가 가장 자연스러운 AI</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>Google Docs·Gmail·스프레드시트 직접 연동 — 파일 열지 않아도 AI가 바로 읽고 정리</li><li>실사 느낌 이미지 생성에 강함 (Nano Banana 기반)</li><li>같은 가격에 Google One 스토리지 2TB 포함</li><li>실시간 검색 기본 내장</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>대화 길어지면 앞 맥락을 "오래된 정보"로 무시하는 경향</li><li>글쓰기 감성·창의성은 세 AI 중 가장 약함</li><li>개인 계정 데이터는 구글 학습에 활용될 수 있음</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>Google 스프레드시트 데이터 분석</li><li>실사 느낌 홍보 이미지·배경 생성</li><li>Gmail 반복 메일 자동화</li><li>구매 관련 견적 비교·정리</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge">HR</span><span class="job-badge">마케팅 기획</span><span class="job-badge match">디자인</span><span class="job-badge">영상 기획</span><span class="job-badge">운영 인프라</span><span class="job-badge match">구매·회계</span></div>
+    </div>
+
+    <div id="tool-notebook" class="tool-card">
+      <div class="card-head"><div class="tool-dot" style="background:#FBBC04"></div><span class="tool-name">NotebookLM</span><span class="tool-price">무료 (Plus: $19.99/월)</span></div>
+      <p class="tool-position">내가 올린 자료 안에서만 답하는, 믿을 수 있는 문서 분석 AI</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>AI 특유의 "지어내는 답변" 없음 — 내가 올린 자료 기반으로만 답하고 출처도 표시</li><li>문서 여러 개를 동시에 분석해서 공통 패턴·차이점 추출</li><li>분석 결과를 PPT 슬라이드 초안으로 자동 변환 가능</li><li>완전 무료로 사용 가능</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>내가 올린 자료 밖의 것은 모름 — 외부 최신 정보 답 못 함</li><li>처음 자료 세팅에 10~15분 걸림 — 즉흥적인 빠른 질문엔 불편</li><li>무료 버전은 소스 50개 한도</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>면담 기록 여러 개 → 공통 주제·패턴 추출</li><li>내부 보고서·규정 문서 → 핵심 요약 및 질의응답</li><li>자료 기반 발표 PPT 초안 자동 생성</li><li>신규 입사자 온보딩 자료 통합 관리</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge match">HR</span><span class="job-badge match">마케팅 기획</span><span class="job-badge">디자인</span><span class="job-badge">영상 기획</span><span class="job-badge match">운영 인프라</span><span class="job-badge">구매·회계</span></div>
+    </div>
+
+    <div id="tool-perplexity" class="tool-card">
+      <div class="card-head"><div class="tool-dot" style="background:#20B8CD"></div><span class="tool-name">Perplexity Pro</span><span class="tool-price">$20/월 (약 28,000원)</span></div>
+      <p class="tool-position">출처를 보여주는 실시간 검색 AI — 구글 검색의 업그레이드판</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>모든 답변에 출처 링크 표시 → 신뢰도 직접 검증 가능</li><li>오늘 올라온 뉴스·자료도 반영하는 실시간 검색</li><li>경쟁사·트렌드·장비 비교를 빠르고 정확하게 정리</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>네이버 블로그·국내 학술자료 등 한국어 소스 검색이 약함</li><li>글 작성·창작 능력은 거의 없음 — 검색·요약까지만 역할</li><li>검색·요약 이상의 심층 분석엔 한계</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>경쟁 동물병원·마케팅 트렌드 리서치</li><li>의료 장비·소모품 최신 가격·스펙 비교</li><li>업계 최신 뉴스·동향 파악</li><li>구매 전 벤더사 비교 조사</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge">HR</span><span class="job-badge match">마케팅 기획</span><span class="job-badge">디자인</span><span class="job-badge">영상 기획</span><span class="job-badge match">운영 인프라</span><span class="job-badge match">구매·회계</span></div>
+    </div>
+
+    <div id="tool-midjourney" class="tool-card">
+      <div class="card-head"><div class="tool-dot" style="background:#2d2d2d"></div><span class="tool-name">Midjourney</span><span class="tool-price">$10/월~ (약 14,000원~)</span></div>
+      <p class="tool-position">압도적인 퀄리티의 이미지가 필요할 때 쓰는 AI</p>
+      <div class="detail-grid">
+        <div class="detail-box box-green"><div class="box-label">장점</div><ul><li>색감·질감·조명 표현이 업계 최고 수준</li><li>무드보드·컨셉 이미지·고품격 마케팅 비주얼에 탁월</li><li>같은 프롬프트로 다양한 시안을 빠르게 여러 장 생성</li></ul></div>
+        <div class="detail-box box-warn"><div class="box-label">단점</div><ul><li>무료 체험 없음 — 무조건 유료</li><li>생성 이미지가 기본으로 공개 갤러리에 노출됨 — 미공개 자료 제작 시 Private 플랜 필요</li><li>저작권 면책 없음 — 상업 사용 가능하지만 법적 리스크는 본인 부담</li><li>프롬프트 작성에 약간의 학습 곡선 있음</li></ul></div>
+      </div>
+      <div class="use-box"><div class="box-label">이런 업무에 써보세요</div><ul><li>VIP 환자용 고품격 브로셔·홍보물 이미지</li><li>캠페인 비주얼·광고 이미지</li><li>SNS 고퀄리티 썸네일</li><li>병원 브랜드 무드보드·방향성 시각화</li></ul></div>
+      <hr class="divider">
+      <p class="match-label">비엔 직무 매칭</p>
+      <div class="job-row"><span class="job-badge">HR</span><span class="job-badge match">마케팅 기획</span><span class="job-badge match">디자인</span><span class="job-badge">영상 기획</span><span class="job-badge">운영 인프라</span><span class="job-badge">구매·회계</span></div>
+    </div>
+  </div>
+
+  <!-- 섹션 2 -->
+  <div id="sec-scenario" class="section">
+    <div class="scenario-group">
+      <div class="scenario-job-label">HR</div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 A — 면담 분석</div><div class="scenario-step">원장단 3인 면담 녹취록 3개를 Claude에 올림</div><div class="scenario-arrow">↓</div><div class="scenario-step">"세 분의 공통 관심사와 서로 다른 우선순위를 정리해줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">5분 만에 구조화된 비교표 생성 — 직접 정리하면 반나절 걸리는 작업</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 B — 설문 분석</div><div class="scenario-step">전 직원 설문 응답 100개를 ChatGPT에 올림</div><div class="scenario-arrow">↓</div><div class="scenario-step">"직무 만족도 관련 응답을 긍정/부정/중립으로 분류하고 자주 나온 키워드 뽑아줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">통계 표 + 키워드 목록 자동 생성 — 수작업 없이 10분 완료</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 C — 자료 아카이빙 및 패턴 분석</div><div class="scenario-step">면담 기록 20개를 NotebookLM에 업로드</div><div class="scenario-arrow">↓</div><div class="scenario-step">"조직 문화 관련 발언만 모아서 공통 패턴을 알려줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">실제 발언 기반으로만 분석 — AI가 지어낸 내용 없이 출처까지 표시</div></div>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-job-label">마케팅 기획</div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 A — 트렌드 리서치 → 콘텐츠 기획</div><div class="scenario-step">Perplexity에 "2025년 동물병원 SNS 마케팅 트렌드" 검색</div><div class="scenario-arrow">↓</div><div class="scenario-step">출처 포함 최신 동향 정리 → ChatGPT에 붙여넣기</div><div class="scenario-arrow">↓</div><div class="scenario-result">"비엔 병원 블로그 포스팅 주제 10개 뽑아줘" → 기획안 초안 즉시 완성</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 B — 글 감성 다듬기</div><div class="scenario-step">ChatGPT로 블로그 글 초안 빠르게 작성</div><div class="scenario-arrow">↓</div><div class="scenario-step">Claude에 붙여넣고 "기계적으로 들리는 표현을 찾아서 자연스럽게 바꿔줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">초안 속도(ChatGPT) + 문장 완성도(Claude) 두 마리 토끼 동시에</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 C — 캠페인 기획안</div><div class="scenario-step">ChatGPT에 "캠페인 기획안 초안, 타겟은 반려견 보호자, 톤은 따뜻하고 전문적으로"</div><div class="scenario-arrow">↓</div><div class="scenario-result">구조화된 기획안 초안 5분 내 생성 → 살을 붙이는 작업만 하면 완성</div></div>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-job-label">디자인</div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 A — 원내 홍보물 배경 이미지 (실사)</div><div class="scenario-step">Gemini에 "동물병원 대기실 분위기, 따뜻하고 안심되는 느낌, 실사 스타일"</div><div class="scenario-arrow">↓</div><div class="scenario-result">사진처럼 자연스러운 배경 이미지 → 홍보물에 바로 활용 가능</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 B — SNS 일러스트 콘텐츠</div><div class="scenario-step">ChatGPT에 "귀여운 강아지 캐릭터, 평온한 병원 느낌, 파스텔 컬러, 인스타그램용"</div><div class="scenario-arrow">↓</div><div class="scenario-result">일러스트 스타일 시안 즉시 생성 → 대화하며 색상·스타일 수정 가능</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 C — VIP 브로셔용 고품격 이미지</div><div class="scenario-step">Midjourney에 "luxury animal hospital, warm lighting, editorial photography style"</div><div class="scenario-arrow">↓</div><div class="scenario-result">프리미엄 브로셔에 바로 쓸 수 있는 수준의 비주얼 — 촬영 비용 없이</div></div>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-job-label">운영 인프라</div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 A — 장비 도입 검토 및 기안서</div><div class="scenario-step">Perplexity에 "초음파 진단기 A vs B 최신 스펙·가격 비교" 검색</div><div class="scenario-arrow">↓</div><div class="scenario-step">출처 포함 비교표 생성 → ChatGPT에 붙여넣고 "도입 기안서 초안 써줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">리서치부터 문서화까지 한 번에 — 원래 하루 걸리던 작업이 1시간으로</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 B — 소모품 발주 패턴 분석</div><div class="scenario-step">소모품 발주 엑셀 파일을 ChatGPT에 업로드</div><div class="scenario-arrow">↓</div><div class="scenario-step">"월별 소비 패턴 분석하고 발주 주기 최적화 제안해줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">그래프 + 표 + 제안 사항 자동 생성 — 수식 없이 데이터 분석 완료</div></div>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-job-label">구매 · 회계</div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 A — 지출 내역 분석</div><div class="scenario-step">월별 지출 내역 Google 스프레드시트 → Gemini 직접 연동</div><div class="scenario-arrow">↓</div><div class="scenario-step">"항목별 증감 분석하고 이상값 있으면 알려줘"</div><div class="scenario-arrow">↓</div><div class="scenario-result">파일을 직접 열지 않아도 즉시 분석 — Google 생태계 쓰면 이게 가장 빠름</div></div>
+      <div class="scenario-card"><div class="scenario-tag">시나리오 B — 반복 공문·품의서 자동화</div><div class="scenario-step">ChatGPT에 품의서 형식 한 번 저장해두기</div><div class="scenario-arrow">↓</div><div class="scenario-step">"이번 달 소모품 구매 품의서, 금액 OO만원, 항목 OO" 입력</div><div class="scenario-arrow">↓</div><div class="scenario-result">완성된 품의서 초안 즉시 생성 — 매번 처음부터 쓰는 시간 절약</div></div>
+    </div>
+  </div>
+
+  <!-- 섹션 3 -->
+  <div id="sec-rec" class="section">
+    <div class="rec-grid">
+      <div class="rec-card"><div class="rec-job-label">HR</div><div class="rec-badges"><span class="badge-1">1순위 — Claude</span><span class="badge-2">2순위 — NotebookLM</span></div><p class="rec-why">글의 품질은 Claude, 자료 기반 신뢰 분석은 NotebookLM. Claude로 보고서·공지를 쓰고, NotebookLM으로 면담 자료를 아카이빙하면 두 역할이 깔끔하게 분리됨.</p></div>
+      <div class="rec-card"><div class="rec-job-label">마케팅 기획</div><div class="rec-badges"><span class="badge-1">1순위 — ChatGPT</span><span class="badge-2">2순위 — Perplexity</span></div><p class="rec-why">콘텐츠 생성·기획안 초안은 ChatGPT, 최신 트렌드·경쟁사 리서치는 Perplexity. 두 개를 연결해서 쓰면 리서치 → 기획이 한 흐름으로 완성됨.</p></div>
+      <div class="rec-card"><div class="rec-job-label">디자인</div><div class="rec-badges"><span class="badge-1">1순위 — Gemini</span><span class="badge-2">2순위 — ChatGPT</span></div><p class="rec-why">실사 이미지는 Gemini, 일러스트·캐릭터는 ChatGPT로 용도를 나눠 사용. 고품격 비주얼이 필요할 때만 Midjourney 추가.</p></div>
+      <div class="rec-card"><div class="rec-job-label">운영 인프라</div><div class="rec-badges"><span class="badge-1">1순위 — ChatGPT</span><span class="badge-2">2순위 — Perplexity</span></div><p class="rec-why">엑셀·데이터 분석은 ChatGPT, 장비·벤더 리서치는 Perplexity. Perplexity 결과를 ChatGPT에서 기안서로 바로 전환하는 흐름이 효율적.</p></div>
+      <div class="rec-card"><div class="rec-job-label">구매 · 회계</div><div class="rec-badges"><span class="badge-1">1순위 — Gemini</span><span class="badge-2">2순위 — ChatGPT</span></div><p class="rec-why">구글 스프레드시트 직접 연동은 Gemini가 단연 유리. 공문·품의서 초안은 ChatGPT 보조. Google 생태계 쓰는 팀이라면 Gemini를 먼저.</p></div>
+    </div>
+  </div>
+
+  <div class="footer"><strong>비엔동물전문의료센터</strong> 운영팀 AI 도구 가이드<br>제작: HR 이석율 · 2025</div>
+</div>
+<script>
+function switchTab(id,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');}
+function switchTool(id,btn){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.tool-card').forEach(c=>c.classList.remove('on'));const el=document.getElementById('tool-'+id);if(el)el.classList.add('on');}
+</script>
+</body>
+</html>
